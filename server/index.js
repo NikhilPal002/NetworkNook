@@ -7,6 +7,7 @@ import multer from 'multer';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
+import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoute.js';
 import userRoutes from './routes/userRoutes.js';
@@ -14,7 +15,13 @@ import postRoutes from './routes/postRoute.js';
 import { register } from './controllers/authController.js';
 import {createPost } from './controllers/postController.js';
 import { verifyToken } from "./middleware/authUser.js";
-import cookieParser from 'cookie-parser';
+
+/* Manually injection of Data  */
+// import User from "./models/User.js";
+// import Post from "./models/Post.js";
+// import { users, posts } from "./data/index.js";
+/* end of section  */
+
 
 // CONFIGURATONS
 
@@ -46,7 +53,7 @@ const upload = multer({ storage });
 
 /* ROUTES WITH FILES */
 app.post("/api/auth/register", upload.single("picture"), register);
-app.post("/api/posts", verifyToken, upload.single("picture"), createPost);
+app.post("/api/post", verifyToken, upload.single("picture"), createPost);
 
 
 /* ROUTES */
@@ -60,6 +67,10 @@ app.use("/api/posts", postRoutes);
 const PORT = process.env.PORT || 6001;
 mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log('Connected to MongoDB!');
+    /* ADD DATA ONE TIME */
+    // User.insertMany(users);
+    // Post.insertMany(posts);
+
 }).catch((error) => console.log(`${error} Did not connect`));
 
 app.listen(PORT, () => {
