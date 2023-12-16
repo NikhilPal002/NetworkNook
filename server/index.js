@@ -53,7 +53,7 @@ const upload = multer({ storage });
 
 /* ROUTES WITH FILES */
 app.post("/api/auth/register", upload.single("picture"), register);
-app.post("/api/post", verifyToken, upload.single("picture"), createPost);
+app.post("/api/posts/create", verifyToken, upload.single("picture"), createPost);
 
 
 /* ROUTES */
