@@ -9,9 +9,12 @@ import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoute.js';
-import userRoutes from './routes/userRoute.js';
+import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoute.js';
 import { register } from './controllers/authController.js';
+import {createPost } from './controllers/postController.js';
+import { verifyToken } from "./middleware/authUser.js";
+import cookieParser from 'cookie-parser';
 
 // CONFIGURATONS
 
@@ -20,6 +23,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(morgan('common'));
@@ -42,11 +46,13 @@ const upload = multer({ storage });
 
 /* ROUTES WITH FILES */
 app.post("/api/auth/register", upload.single("picture"), register);
+app.post("/api/posts", verifyToken, upload.single("picture"), createPost);
 
 
 /* ROUTES */
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/posts", postRoutes);
 
 
 // MONGOOSE SETUP 
@@ -56,6 +62,6 @@ mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log('Connected to MongoDB!');
 }).catch((error) => console.log(`${error} Did not connect`));
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
